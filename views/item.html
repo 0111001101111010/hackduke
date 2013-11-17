@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+
+    <title>Paypal Roulette - Let us spend your money for you </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="jumbotron.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body style="background:url('assets/bg.png') repeat fixed top">
+
+    <nav class="navbar navbar-roulette" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"><img src="assets/logo_120.png"></a>
+    </div>
+    
+  </nav>
+
+    <div class="container whitebox" style="text-align:center;">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Mystery Item</h2><br>
+          <canvas id="canvas" width="500" height="400"></canvas>
+          <br>
+          <input id="blocks" value="2" style="display:none"><br>
+
+          <p>
+            <button class="btn btn-roulette2 btn-lg" data-toggle="modal" data-target="#myModal">Buy</button> 
+
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Confirmation</h4>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to purchase the Mystery Item?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">NOPE</button>
+                    <button type="button" class="btn btn-primary">SHUT UP AND TAKE MY MONEY</button>
+                  </div>
+                </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+
+            <a class="btn btn-roulette btn-lg" role="button" href="ebay">Spin Again</a></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Company 2013</p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+    /// (C) Ken Fyrstenberg Nilsen, Abdias Software, CC3.0-attribute.
+var ctx = canvas.getContext('2d'),
+    img = new Image(),
+    play = false;
+
+/// turn off image smoothing - this will give the pixelated effect
+ctx.mozImageSmoothingEnabled = false;
+ctx.webkitImageSmoothingEnabled = false;
+ctx.imageSmoothingEnabled = false;
+
+/// wait until image is actually available
+img.onload = pixelate;
+
+/// some image, we are not struck with CORS restrictions as we
+/// do not use pixel buffer to pixelate, so any image will do
+img.src = 'assets/sample.png';
+
+/// MAIN function
+function pixelate(v) {
+
+    /// if in play mode use that value, else use slider value
+    var size = (play ? v : blocks.value) * 0.01,
+
+        /// cache scaled width and height
+        w = canvas.width * size,
+        h = canvas.height * size;
+
+    /// draw original image to the scaled size
+    ctx.drawImage(img, 0, 0, w, h);
+
+    /// then draw that scaled image thumb back to fill canvas
+    /// As smoothing is off the result will be pixelated
+    ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+}
+
+/// This runs the demo animation to give an impression of
+/// performance.
+function toggleAnim() {
+
+    /// limit blocksize as we don't want to animate tiny blocks
+    var v = Math.min(25, parseInt(blocks.value, 10)),
+        dx = 0.5; /// "speed"
+
+    /// toggle play flag set by button "Animate"
+    play = !play;
+
+    /// and update button's text
+    animate.value = play ? 'Stop' : 'Animate';
+
+    /// if in play mode start loop
+    if (play === true) anim();
+
+    /// animation loop
+    function anim() {
+
+        /// increase or decrease value
+        v += dx;
+
+        /// if at min or max reverse delta
+        if (v <= 1 || v > 25) dx = -dx;
+
+        /// pixelate image with current value
+        pixelate(v);
+
+        /// loop
+        if (play === true) requestAnimationFrame(anim);
+    }
+}
+
+/// event listeneners for slider and button
+blocks.addEventListener('change', pixelate, false);
+animate.addEventListener('click', toggleAnim, false);
+
+/// poly-fill for requestAnmationFrame with fallback for older
+/// browsers which do not support rAF.
+window.requestAnimationFrame = (function () {
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function (callback) {
+        window.setTimeout(callback, 1000 / 60);
+    };
+})();</script>
+  </body>
+</html>
+

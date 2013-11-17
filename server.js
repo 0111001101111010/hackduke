@@ -70,6 +70,17 @@ server.get('/', function(req,res){
   });
 });
 
+//item page
+server.get('/item', function(req,res){
+  res.render('item.jade', {
+    locals : { 
+              title : 'Your Page Title'
+             ,description: 'Your Page Description'
+             ,author: 'Your Name'
+             ,analyticssiteid: 'XXXXXXX' 
+            }
+  });
+});
 
 //roulette page
 server.get('/loading', function(req,res){
