@@ -1,0 +1,18 @@
+Paypal Roulette
+----
+A fun app for friend gift exchange. Set your cash threshold, ebay category and go. 
+Its hard to get gifts, so why not leave the decision to chance? Return a random interpolated result that is offered to the user to buy for their friend! We are the middleman and ship straight to your recipient anonymously. 
+
+
+
+Stack
+---
++express.js
++bootstrap3
++ql.io
+
+API
+---
+Ebay
+Paypal
+Lob
