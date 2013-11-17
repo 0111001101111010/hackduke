@@ -111,46 +111,73 @@ server.get('/ebay', function(req,res){
   });
 });
 
-var paypal_sdk = require('paypal-rest-sdk');
+var paypal= require('paypal-rest-sdk');
 //paypal
 //szheng2-facilitator@live.com
 //api.sandbox.paypal.com
 //Client ID AQ7dlxAIADoVBkbKr8uqfB7ZHMb0pa5u50Q4gT8-2SElUBTvx9GsCDd0sIkX
 //EL50PxCf1_Cn4kK1eiwNNR0yMGtN66JMymCXj7hNlGonMqvAZGmbHdlOTIPq
-paypal_sdk.configure({
+paypal.configure({
   'host': 'api.sandbox.paypal.com',
   'port': '',
   'client_id': 'AQ7dlxAIADoVBkbKr8uqfB7ZHMb0pa5u50Q4gT8-2SElUBTvx9GsCDd0sIkX',
-  'client_secret': 'EL50PxCf1_Cn4kK1eiwNNR0yMGtN66JMymCXj7hNlGonMqvAZGmbHdlOTIPqeb'
+  'client_secret': 'EL50PxCf1_Cn4kK1eiwNNR0yMGtN66JMymCXj7hNlGonMqvAZGmbHdlOTIPq'
 });
 
-var create_payment_json = {
-    "intent": "sale",
-    "payer": {
-        "payment_method": "paypal"
+var payment = {
+  "intent": "sale",
+  "payer": {
+    "payment_method": "paypal"
+  },
+  "redirect_urls": {
+    "return_url": "http://yoururl.com/execute",//fix this eventulally
+    "cancel_url": "http://yoururl.com/cancel"
+  },
+  "transactions": [{
+    "amount": {
+      "total": "5.00",
+      "currency": "USD"
     },
-    "redirect_urls": {
-        "return_url": "http:\/\/localhost\/test\/rest\/rest-api-sdk-php\/sample\/payments\/ExecutePayment.php?success=true",
-        "cancel_url": "http:\/\/localhost\/test\/rest\/rest-api-sdk-php\/sample\/payments\/ExecutePayment.php?success=false"
-    },
-    "transactions": [{
-        "amount": {
-            "currency": "USD",
-            "total": "1.00"
-        },
-        "description": "This is the payment description."
-    }]
+    "description": "My awesome payment"
+  }]
 };
+
+
+
 server.get('/paypal', function(req,res){
    console.log("hello paypal");
-  res.render('paypal.jade', {
-    locals : { 
-              title : 'Your Page Title'
-             ,description: 'Your Page Description'
-             ,author: 'Your Name'
-             ,analyticssiteid: 'XXXXXXX'
-            }
-  });
+
+paypal.payment.create(payment, function (error, payment) {
+  if (error) {
+    console.log(error);
+
+
+  } else {
+    console.log(payment);
+    console.log("testing");
+    if(payment.payer.payment_method === 'paypal') {
+      req.session.paymentId = payment.id;
+      var redirectUrl;
+      for(var i=0; i < payment.links.length; i++) {
+        var link = payment.links[i];
+        if (link.method === 'REDIRECT') {
+          redirectUrl = link.href;
+        }
+      }
+      console.log(redirectUrl);
+      res.redirect(redirectUrl);
+    }
+  }
+});
+
+  // res.render('paypal.jade', {
+  //   locals : { 
+  //             title : 'Your Page Title'
+  //            ,description: 'Your Page Description'
+  //            ,author: 'Your Name'
+  //            ,analyticssiteid: 'XXXXXXX'
+  //           }
+  // });
 });
 
 
